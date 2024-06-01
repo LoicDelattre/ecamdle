@@ -53,6 +53,11 @@ class GUI:
         
         return entry 
     
+    def newBoard(self, frame : CTkFrame):
+        self.clearFrame(frame)
+        self.setupMainFrame()
+        pass
+    
     def setupMainFrame(self):
         mainFrame = CTkFrame(self.root)
         set_appearance_mode("dark")
@@ -80,7 +85,11 @@ class GUI:
         
         bottomFrame.buttonNewTry = CTkButton(master = bottomFrame, text="New Try", 
                                   command= lambda : self.addNewTryRow(topFrame), fg_color = self.frameBgColor)
-        bottomFrame.buttonNewTry.place(relx = 0.5, rely = 0.5, anchor = CENTER)
+        bottomFrame.buttonNewTry.place(relx = 0.3, rely = 0.7, anchor = CENTER)
+        
+        bottomFrame.buttonNewGame = CTkButton(master = bottomFrame, text="New Game", 
+                                  command= lambda : self.newBoard(mainFrame), fg_color = self.frameBgColor)
+        bottomFrame.buttonNewGame.place(relx = 0.7, rely = 0.7, anchor = CENTER)
              
         pass
     
