@@ -134,7 +134,8 @@ class GUI:
         for category in self.categories:
             if category != "Name":
                 button = CTkButton(frame, width = self.categories[category], text = "", 
-                                       fg_color = ("white", self.frameBgColor), corner_radius=self.labelRad, command = lambda : self.applyStateToButton(button))
+                                       fg_color = ("white", self.frameBgColor), corner_radius=self.labelRad)
+                button.configure(command = lambda button = button : self.applyStateToButton(button))
                 button.grid(row = 1 + self.tryNumber, column = columnNum, padx = self.padTableX, pady = self.padTableY)
                 columnNum += 1
             pass
