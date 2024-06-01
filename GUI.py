@@ -19,23 +19,27 @@ class GUI:
         self.padTableY = 3
         
         self.categories = {
-            "Name": 200, 
-            "Sex": 100, 
-            "Role": 100, 
-            "Asso": 100, 
-            "Club": 100, 
-            "Race": 100, 
-            "Taille": 100, 
-            "Appreciation": 100, 
-            "BG": 100}
+            "Name": [200], 
+            "Sex": [100, True], 
+            "Role": [100, True], 
+            "Asso": [100, True], 
+            "Club": [100, True], 
+            "Race": [100, True], 
+            "Taille": [100, False], 
+            "Appreciation": [100, False],
+            "BG": [100, False]}
         
         self.analogButtonsColor = "#135f80"
         self.digitalButtonColor = "#642d96"
-        
-        self.status = ""
-        self.color = "#"
+
+        self.validColor = "#1e850c"
+        self.invalidColor = "#e30b16"
         
         self.tryNumber = 0
+        self.currentTryButtonsStates = []
+        
+        self.digitalStates = ["YES", "NO"]
+        self.analogStates = ["MORE", "LESS", "EQUAL"]
         
         self.setupMainFrame()
         
@@ -64,7 +68,7 @@ class GUI:
         columnNum : int = 1
         
         for category in self.categories:
-            label = CTkLabel(topFrame, width = self.categories[category], text = category, fg_color = ("white", self.frameBgColor), corner_radius=self.labelRad)
+            label = CTkLabel(topFrame, width = self.categories[category][0], text = category, fg_color = ("white", self.frameBgColor), corner_radius=self.labelRad)
             label.grid(row = 1, column = columnNum, padx = self.padTableX, pady = self.padTableY)
             columnNum += 1
           
@@ -76,72 +80,66 @@ class GUI:
         
         bottomFrame.buttonNewTry = CTkButton(master = bottomFrame, text="New Try", 
                                   command= lambda : self.addNewTryRow(topFrame), fg_color = self.frameBgColor)
-        bottomFrame.buttonNewTry.place(relx = 0.5, rely = 0.3, anchor = CENTER)
-        
-        def moreEffect():
-            self.color = "#e30b16"
-            self.status = "MORE"
-            pass
-        
-        def lessEffect():
-            self.color = "#e30b16"
-            self.status = "LESS"
-            pass
-        
-        def equalEffect():
-            self.color = "#1e850c"
-            self.status = "EQUAL"
-            pass
-        
-        def yesEffect():
-            self.color = "#1e850c"
-            self.status = "YES"
-            pass
-        
-        def noEffect():
-            self.color = "#e30b16"
-            self.status = "NO"
-            pass
-        
-        buttonMore = CTkButton(master = bottomFrame, text="More", 
-                                  fg_color = self.analogButtonsColor, command = lambda : moreEffect())
-        buttonMore.place(relx = 0.1, rely = 0.7, anchor = CENTER)
-        
-        buttonEqual = CTkButton(master = bottomFrame, text="Equal", 
-                                  fg_color = self.analogButtonsColor, command = lambda : equalEffect())
-        buttonEqual.place(relx = 0.3, rely = 0.7, anchor = CENTER)
-        
-        buttonLess = CTkButton(master = bottomFrame, text="Less", 
-                                  fg_color = self.analogButtonsColor, command = lambda : lessEffect())
-        buttonLess.place(relx = 0.5, rely = 0.7, anchor = CENTER)
-        
-        buttonYes = CTkButton(master = bottomFrame, text="Yes", 
-                                  fg_color = self.digitalButtonColor, command = lambda : yesEffect())
-        buttonYes.place(relx = 0.7, rely = 0.7, anchor = CENTER)
-        
-        buttonNo = CTkButton(master = bottomFrame, text="No", 
-                                  fg_color = self.digitalButtonColor, command = lambda : noEffect())
-        buttonNo.place(relx = 0.9, rely = 0.7, anchor = CENTER)
-        
+        bottomFrame.buttonNewTry.place(relx = 0.5, rely = 0.5, anchor = CENTER)
+             
         pass
     
     def addNewTryRow(self, frame : CTkFrame):
+        self.currentTryButtonsStates = []
         self.tryNumber += 1
-        nameEntry = self.createEntryInFrame(frame, width = self.categories["Name"])
+        nameEntry = self.createEntryInFrame(frame, width = self.categories["Name"][0])
         nameEntry.grid(row = 1 + self.tryNumber, column = 1, padx = self.padTableX)
 
         columnNum : int = 2
         for category in self.categories:
             if category != "Name":
-                button = CTkButton(frame, width = self.categories[category], text = "", 
-                                       fg_color = ("white", self.frameBgColor), corner_radius=self.labelRad)
-                button.configure(command = lambda button = button : self.applyStateToButton(button))
+                self.currentTryButtonsStates.append(0)
+                button = CTkButton(frame, width = self.categories[category][0], text = "", 
+                                       fg_color = ("white", self.frameBgColor), corner_radius=self.labelRad, hover = False)
+                buttonNum = columnNum - 1
+                button.configure(command = lambda button = button, buttonNum = buttonNum : self.applyStateToButton(button, buttonNum))
                 button.grid(row = 1 + self.tryNumber, column = columnNum, padx = self.padTableX, pady = self.padTableY)
                 columnNum += 1
             pass
     
-    def applyStateToButton(self, button : CTkButton):
-        button.configure(fg_color = self.color, text = self.status)
+    def applyStateToButton(self, button : CTkButton, buttonNum : int):
+        categoryNum = 0
+        maxToggleNum = 0
+        isDigital = False
+        for category in self.categories:
+            if categoryNum == buttonNum:
+                isDigital = self.categories[category][1]
+                if isDigital:
+                    maxToggleNum = 2
+                else:
+                    maxToggleNum = 3
+                break
+            categoryNum += 1
+        
+        buttonToggleValue = self.currentTryButtonsStates[buttonNum-1]
+        
+        if buttonToggleValue == maxToggleNum:
+            self.currentTryButtonsStates[buttonNum-1] = 1
+        else:
+            self.currentTryButtonsStates[buttonNum-1] += 1
+        
+        color = ""
+        status = ""
+        if isDigital:
+            status = self.digitalStates[buttonToggleValue - 1]
+            if status == "YES":
+                color = self.validColor
+            else:
+                color = self.invalidColor
+        else:
+            status = self.analogStates[buttonToggleValue - 1]  
+            if status == "EQUAL":
+                color = self.validColor
+            else:
+                color = self.invalidColor  
+        
+        button.configure(fg_color = color, text = status)
+       
         pass
     
     def clearFrame(self, frame: CTkFrame):
