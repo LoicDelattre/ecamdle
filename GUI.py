@@ -11,7 +11,8 @@ class GUI:
         self.root.geometry('1080x820')
         
         self.labelBgColor = "#3e3261"
-        self.frameBgColor = "#29276e"
+        self.frameBgColor = "#5f1ced"
+        self.tryBgColor = "#3b79e3"
         self.appBg = "#2b2b2b"
         self.blackBg = "#000000"
         self.labelRad = 4
@@ -29,6 +30,8 @@ class GUI:
             "Appreciation": [100, False],
             "BG": [100, False]}
         
+        self.currentTryNum = 0
+
         self.analogButtonsColor = "#135f80"
         self.digitalButtonColor = "#642d96"
 
@@ -94,6 +97,7 @@ class GUI:
         pass
     
     def addNewTryRow(self, frame : CTkFrame):
+        self.currentTryNum += 1
         self.currentTryButtonsStates = []
         self.tryNumber += 1
         nameEntry = self.createEntryInFrame(frame, width = self.categories["Name"][0])
@@ -104,7 +108,7 @@ class GUI:
             if category != "Name":
                 self.currentTryButtonsStates.append(0)
                 button = CTkButton(frame, width = self.categories[category][0], text = "", 
-                                       fg_color = ("white", self.frameBgColor), corner_radius=self.labelRad, hover = False)
+                                       fg_color = ("white", self.tryBgColor), corner_radius=self.labelRad, hover = False)
                 buttonNum = columnNum - 1
                 button.configure(command = lambda button = button, buttonNum = buttonNum : self.applyStateToButton(button, buttonNum))
                 button.grid(row = 1 + self.tryNumber, column = columnNum, padx = self.padTableX, pady = self.padTableY)
